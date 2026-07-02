@@ -144,29 +144,30 @@ def getPlaylist() -> list[list[str]]:
             comment = '#' # m3u8 compatibility
         if firstSegment == comment*2:
             controls = [False, None, None]
-            rawControls = firstLine.split(" ")
+            rawControls = firstLine.split(' ')
             
             # we're actually going into a different directory
-            if rawControls[1] == 'd':
+            if 'd' in rawControls:
                 usingDirectory = True
-                usedPath = musicPath+'/'+songs[1]
+                usedPath = musicPath+'/'+songs[1] # TODO refactor this so we can accept multiple directories
                 songs = os.listdir(usedPath)
-                # Passing off if needed
-                if len(rawControls) > 2 and (rawControls[2] == 'y' or rawControls[2] == 'n'):
-                    rawControls = rawControls[1:]
 
-            if rawControls[1] == 'y':
+            if 'y' in rawControls:
                 controls[0] = True
-            if rawControls[1] == 'n' or rawControls[1] == 'y':
-                # If we are 100% controls
-                try:
-                    nextVol = float(rawControls[2])
-                    if nextVol > 0 and nextVol <= 1:
-                        controls[1] = nextVol
-                        forceOver = rawControls[3]
-                        controls[2] = forceOver
-                except Exception:
-                    pass # We do nothing because if an exception occurred then user didn't use this control signal
+            
+            if 'v' in rawControls:
+                indexV = rawControls.index('v')
+                if len(rawControls) < indexV+2:
+                    print('Incorrect formatting of playlist, there must be a float value after "v".\nIgnoring volume controls for this playlist.')
+                else:
+                    try:
+                        volume = float(rawControls[indexV+1])
+                        controls[1] = volume
+                    except Exception:
+                        print('Value after "v" in playlist isn\'t a float value.\nIgnoring volume controls for this playlist.')
+
+            if 'f' in rawControls:
+                controls[2] = True
 
         # get the songs
         for rawSong in songs:

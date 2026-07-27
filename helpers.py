@@ -134,24 +134,15 @@ def getPlaylist() -> list[list[str]]:
     usingDirectory = False
 
     with open(chosenFile, 'r') as file:
-        songs = file.read().split('\n')
+        lines = file.read().split('\n')
 
         # check if we have controls
-        firstLine = songs[0]
-        comment = '/'
+        firstLine = lines[0]
         firstSegment = firstLine[0:2]
-        if firstLine[0] == '#':
-            comment = '#' # m3u8 compatibility
-        if firstSegment == comment*2:
+        if firstSegment == '##':
             controls = [False, None, None]
             rawControls = firstLine.split(' ')
             
-            # we're actually going into a different directory
-            if 'd' in rawControls:
-                usingDirectory = True
-                usedPath = musicPath+'/'+songs[1] # TODO refactor this so we can accept multiple directories
-                songs = os.listdir(usedPath)
-
             if 'y' in rawControls:
                 controls[0] = True
             
@@ -170,16 +161,21 @@ def getPlaylist() -> list[list[str]]:
                 controls[2] = True
 
         # get the songs
-        for rawSong in songs:
-            song = rawSong.split(comment)[0].strip()
-            if not usingDirectory:
-                filepath = _isFileInList(musicList, song, usedPath)
+        for line in lines:
+            song = line.split('#')[0].strip()
+            
+            # directory case
+            if song != '' and song[-1] == '/' and song[:-1] in musicList:
+                for dirSong in os.listdir(usedPath+'/'+song):
+                    if '.' in dirSong: # no recursive searching
+                        fetchedPlaylist.append(usedPath+'/'+song+'/'+dirSong)
+            # normal file case
             else:
-                filepath = usedPath+'/'+song
-            if filepath is not None:
-                fetchedPlaylist.append(filepath)
-            elif song != '':
-                print(song+" is not found within "+usedPath)
+                filepath = _isFileInList(musicList, song, usedPath)
+                if filepath is not None:
+                    fetchedPlaylist.append(filepath)
+                elif song != '':
+                    print(song+" is not found within "+usedPath)
 
     return [fetchedPlaylist, controls]
 

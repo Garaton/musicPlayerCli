@@ -1,11 +1,13 @@
-// y 1 f
-/ grunts
+## y 1 f
+# grunts
 huh
-   hoo /real file
-/NOTREe / not file
+   hoo #real file
+#NOTREe # not file
 rock.wav
 NOTREAL
 
-/ hi this is a comment :3 /
+dir/ # this is a directory
 
-/NOTRE
+# hi this is a comment :3 #
+
+#NOTRE

@@ -1,3 +1,10 @@
+#
+# Author: Garathon
+#
+# Copywrite: LOLOLOL
+#
+
+
 import sys, subprocess, os
 
 # Defining Enums
@@ -12,20 +19,7 @@ class ControlSignals():
     LOOP = 3
     PREVIOUS = 4
     EXIT = 5
-class HelpTexts:
-    q = "q - Current Queue - Prints the songs in the playlist w/ order along with the current song surrounded by []."
-    s = "s - Skip Song - Ends the current song prematurely and moves onto the next one, with loop enable this acts as a restart."
-    p = "p - Previous Song - End the current song prematurely and moves to the previous song, OVERRIDES LOOP."
-    l = "l - Loop Current Song - Tells the audio player to replay the song instead of moving onto the next one."
-    st = "st - Stop Song - This doesn't 'pause' the song, it turns off the volume and just loops the song. Hey give me some credit it's creative. PRESERVES PREVIOUS LOOPING STATUS."
-    r = "r - Restart Playlist - Stops the song and then starts the play list from the start."
-    h = "h - Shuffle Playlist - Shuffles the current playlist, does not preserve the current song."
-    n = "n - New Playlist - Prompts you to give a new playlist to listen to."
-    nh = "nh - New Playlist And Shuffle - I wonder if new playlist and shuffle, prompts you to get a new playlist, and shuffles it for you, hmm."
-    v = "v - Set Volume - Asks for a volume from 0-1 from the user then sets the volume of this python application, usually."
-    vf = "vf - Force Volume - In the case that volume isn't set to where you want it, spam this a few times."
-    e = "e - Exit - 'Gracefully' exits the program, it's multithreaded so it's not that graceful but it's better."
-    help = "help [cmd] - Help - Gives help about a single command, and if you input nothing, everything! Also weird to say help help, but you do you pal."
+    INDEX = 6
 
 # Getting platform/os
 platform = sys.platform

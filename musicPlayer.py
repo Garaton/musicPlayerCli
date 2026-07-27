@@ -64,7 +64,7 @@ def playsongs():
                     case _:
                         print("ERROR UNRECOGNIZED CONTROL SIGNAL "+controlSignal)
                 
-                controlSignal = None # Reset control signal to None
+                globals.controlSignal = None # Reset control signal to None
 
                 # If we were ordered to restart do so
                 if restart:

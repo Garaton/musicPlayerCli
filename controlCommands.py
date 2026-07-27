@@ -7,15 +7,15 @@
 
 from random import shuffle
 import sys
+import globals
 from collections.abc import Callable
 from helpers import ControlSignals, getPlaylist, setVolume
-from musicPlayer import curSong, playlist, argsPassToPlayer, currentSound, currentVolume, isStopped, movementControl, wasLooping, controlSignal, newPlaylist
 
 
 # Command class/struct
 class Command:
     helpText:str
-    function:Callable[[list]]
+    function:Callable[[list[str]]]
 
     def __init__(self, function, helpText):
         self.helpText = helpText
@@ -24,21 +24,20 @@ class Command:
 
 # Command Functions
 def exitProg(args:list):
-    global movementControl
-    movementControl = ControlSignals.EXIT
-    if currentSound is not None:
-        currentSound.stop()
+    globals.movementControl = ControlSignals.EXIT
+    if globals.currentSound is not None:
+        globals.currentSound.stop()
     sys.exit(0)
 
 def queue(args:list):
     print("Songs in queue:")
-    for i in range(len(playlist)):
-        if i == curSong:
-            print(f"-->\t[{playlist[i].split('/')[-1]}]")
+    for i in range(len(globals.playlist)):
+        if i == globals.curSong:
+            print(f"-->\t[{globals.playlist[i].split('/')[-1]}]")
         else:
-            print(f"{i}\t{playlist[i].split('/')[-1]}")
+            print(f"{i}\t{globals.playlist[i].split('/')[-1]}")
 
-def help(args:list):
+def help(args:list[str]):
     if len(args) > 1:
         if args[1] in commandDict:
             print(commandDict[args[1]].helpText)
@@ -49,109 +48,103 @@ def help(args:list):
             print(command.helpText)
 
 def skip(args:list):
-    if currentSound is not None:
-        currentSound.stop()
+    if globals.currentSound is not None:
+        globals.currentSound.stop()
 
 def previous(args:list):
-    global movementControl
-    movementControl = ControlSignals.PREVIOUS
-    if currentSound is not None:
-        currentSound.stop()
+    globals.movementControl = ControlSignals.PREVIOUS
+    if globals.currentSound is not None:
+        globals.currentSound.stop()
 
 def loop(args:list):
-    global movementControl
-    if movementControl != ControlSignals.LOOP:
-        movementControl = ControlSignals.LOOP
+    if globals.movementControl != ControlSignals.LOOP:
+        globals.movementControl = ControlSignals.LOOP
     else:
-        movementControl = None
+        globals.movementControl = None
 
 def shufflePlay(args:list):
-    global controlSignal
-    controlSignal = ControlSignals.RESTART_SHUFFLE
-    if currentSound is not None:
-        currentSound.stop()
+    globals.controlSignal = ControlSignals.RESTART_SHUFFLE
+    if globals.currentSound is not None:
+        globals.currentSound.stop()
 
 def newPlay(args:list):
-    global newPlaylist
-    global controlSignal
-    global currentVolume
     gotPlaylist = getPlaylist()
-    if newPlaylist != None:
-        newPlaylist = gotPlaylist[0]
+    if globals.newPlaylist != None:
+        globals.newPlaylist = gotPlaylist[0]
         startingControls = gotPlaylist[1]
         if startingControls != None:
             if startingControls[0]:
-                shuffle(newPlaylist)
+                shuffle(globals.newPlaylist)
             if startingControls[2] != None and startingControls[1] != None:
-                currentVolume = startingControls[1]
-                setVolume(currentVolume)
-        controlSignal = ControlSignals.NEW_PLAYLIST # new playlist
-        if currentSound is not None:
-            currentSound.stop()
+                globals.currentVolume = startingControls[1]
+                setVolume(globals.currentVolume)
+
+        globals.controlSignal = ControlSignals.NEW_PLAYLIST # new playlist
+        if globals.currentSound is not None:
+            globals.currentSound.stop()
 
 def newPlayShuffle(args:list):
-    global newPlaylist
-    global controlSignal
-    global currentVolume
     gotPlaylist = getPlaylist()
-    if newPlaylist != None:
-        newPlaylist = gotPlaylist[0]
+    if globals.newPlaylist != None:
+        globals.newPlaylist = gotPlaylist[0]
         startingControls = gotPlaylist[1]
         if startingControls[2] != None and startingControls[1] != None:
-            currentVolume = startingControls[1]
-            setVolume(currentVolume)
-        shuffle(newPlaylist)
-        controlSignal = ControlSignals.NEW_PLAYLIST # new playlist
-        if currentSound is not None:
-            currentSound.stop()
+            globals.currentVolume = startingControls[1]
+            setVolume(globals.currentVolume)
+        shuffle(globals.newPlaylist)
+
+        globals.controlSignal = ControlSignals.NEW_PLAYLIST # new playlist
+        if globals.currentSound is not None:
+            globals.currentSound.stop()
 
 def stop(args:list):
-    global isStopped
-    global movementControl
-    global wasLooping
-    if not isStopped:
-        if movementControl == ControlSignals.LOOP:
-            wasLooping = True
-        isStopped = True
+    if not globals.isStopped:
+        if globals.movementControl == ControlSignals.LOOP:
+            globals.wasLooping = True
+        globals.isStopped = True
         setVolume(0)
-        movementControl = ControlSignals.LOOP
+        globals.movementControl = ControlSignals.LOOP
     else:
-        isStopped = False
-        if not wasLooping:
-            movementControl = None
-        wasLooping = False
-        setVolume(currentVolume)
+        globals.isStopped = False
+        if not globals.wasLooping:
+            globals.movementControl = None
+        globals.wasLooping = False
+        setVolume(globals.currentVolume)
 
 def restart(args:list):
-    global controlSignal
-    controlSignal = ControlSignals.RESTART
-    if currentSound is not None:
-        currentSound.stop()
+    globals.controlSignal = ControlSignals.RESTART
+    if globals.currentSound is not None:
+        globals.currentSound.stop()
 
-def goToIndex(args:list):
-    global argsPassToPlayer
-    global movementControl
+def goToIndex(args:list[str]):
     if len(args) == 1:
-        if args[0] < len(playlist):
-            argsPassToPlayer = [args[0]]
-            movementControl = ControlSignals.INDEX
+        if args[0].isnumeric():
+            indexSong = int(args[0])
+            if indexSong < len(globals.playlist) and indexSong >= 0:
+                globals.argsPassToPlayer = [indexSong]
+                globals.movementControl = ControlSignals.INDEX
+            else:
+                print(f"Index out of bounds for length {len(globals.playlist)}.")
         else:
-            print(f"Index out of bounds for length {len(playlist)}.")
+            print("Please enter a number for the index not a string.")
     else:
         print("Too few or too many arguments for command.\n\tUsage:\ti [song-index]")
 
 def volumeForce(args:list):
-    setVolume(currentVolume)
+    setVolume(globals.currentVolume)
 
-def volume(args:list):
-    global currentVolume
+def volume(args:list[str]):
     if len(args) == 1:
-        newCurrentVolume = args[0]
-        if newCurrentVolume > 1.0 or newCurrentVolume < 0.0:
-            print("Entered volume was not between 0.0 and 1.0, moving back to control panel.")
+        if args[0].isnumeric():
+            newCurrentVolume = float(args[0])
+            newCurrentVolume = 999
+            if newCurrentVolume > 1.0 or newCurrentVolume < 0.0:
+                print("Entered volume was not between 0.0 and 1.0, moving back to control panel.")
+            else:
+                globals.currentVolume = newCurrentVolume
+                setVolume(globals.currentVolume)
         else:
-            currentVolume = newCurrentVolume
-            setVolume(currentVolume)
+            print("Please enter a number for the index not a string.")
     else:
         print("Too few or too many arguments for command.\n\tUsage:\tv [value 0 to 1]")
 

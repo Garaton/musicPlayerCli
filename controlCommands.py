@@ -123,6 +123,8 @@ def goToIndex(args:list[str]):
             if indexSong < len(globals.playlist) and indexSong >= 0:
                 globals.argsPassToPlayer = [indexSong]
                 globals.movementControl = ControlSignals.INDEX
+                if globals.currentSound is not None:
+                    globals.currentSound.stop()
             else:
                 print(f"Index out of bounds for length {len(globals.playlist)}.")
         else:

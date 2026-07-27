@@ -37,14 +37,15 @@ else:
     platform = Os.UNSUPPORTED
 
 # Getting needed file variables
-playlistPath:list = os.getcwd()+"/playlists"
+playlistPath:list = os.getcwd()+'/playlists'
 playlistList:list = []
 for file in os.listdir(playlistPath):
     fileExt = file.split('.')[-1]
     if fileExt == 'mplay' or fileExt == 'm3u8':
         playlistList.append(file)
-musicPath:list = os.getcwd()+"/music"
-musicList:list = os.listdir(musicPath)
+musicPath:list = os.getcwd()+'/music'
+filesInDir:list = os.listdir(musicPath)
+musicList:list = [f for f in filesInDir if os.path.isfile(musicPath+'/'+f)]
 
 
 
@@ -134,51 +135,48 @@ def getPlaylist() -> list[list[str]]:
     usingDirectory = False
 
     with open(chosenFile, 'r') as file:
-        songs = file.read().split('\n')
+        lines = file.read().split('\n')
 
         # check if we have controls
-        firstLine = songs[0]
-        comment = '/'
+        firstLine = lines[0]
         firstSegment = firstLine[0:2]
-        if firstLine[0] == '#':
-            comment = '#' # m3u8 compatibility
-        if firstSegment == comment*2:
+        if firstSegment == '##':
             controls = [False, None, None]
-            rawControls = firstLine.split(" ")
+            rawControls = firstLine.split(' ')
             
-            # we're actually going into a different directory
-            if rawControls[1] == 'd':
-                usingDirectory = True
-                usedPath = musicPath+'/'+songs[1]
-                songs = os.listdir(usedPath)
-                # Passing off if needed
-                if len(rawControls) > 2 and (rawControls[2] == 'y' or rawControls[2] == 'n'):
-                    rawControls = rawControls[1:]
-
-            if rawControls[1] == 'y':
+            if 'y' in rawControls:
                 controls[0] = True
-            if rawControls[1] == 'n' or rawControls[1] == 'y':
-                # If we are 100% controls
-                try:
-                    nextVol = float(rawControls[2])
-                    if nextVol > 0 and nextVol <= 1:
-                        controls[1] = nextVol
-                        forceOver = rawControls[3]
-                        controls[2] = forceOver
-                except Exception:
-                    pass # We do nothing because if an exception occurred then user didn't use this control signal
+            
+            if 'v' in rawControls:
+                indexV = rawControls.index('v')
+                if len(rawControls) < indexV+2:
+                    print('Incorrect formatting of playlist, there must be a float value after "v".\nIgnoring volume controls for this playlist.')
+                else:
+                    try:
+                        volume = float(rawControls[indexV+1])
+                        controls[1] = volume
+                    except Exception:
+                        print('Value after "v" in playlist isn\'t a float value.\nIgnoring volume controls for this playlist.')
+
+            if 'f' in rawControls:
+                controls[2] = True
 
         # get the songs
-        for rawSong in songs:
-            song = rawSong.split(comment)[0].strip()
-            if not usingDirectory:
-                filepath = _isFileInList(musicList, song, usedPath)
+        for line in lines:
+            song = line.split('#')[0].strip()
+            
+            # directory case
+            if song != '' and song[-1] == '/' and song[:-1] in filesInDir and os.path.isdir(musicPath+'/'+song):
+                for dirSong in os.listdir(usedPath+'/'+song):
+                    if '.' in dirSong: # no recursive searching
+                        fetchedPlaylist.append(usedPath+'/'+song+'/'+dirSong)
+            # normal file case
             else:
-                filepath = usedPath+'/'+song
-            if filepath is not None:
-                fetchedPlaylist.append(filepath)
-            elif song != '':
-                print(song+" is not found within "+usedPath)
+                filepath = _isFileInList(musicList, song, usedPath)
+                if filepath is not None:
+                    fetchedPlaylist.append(filepath)
+                elif song != '':
+                    print(song+" is not found within "+usedPath)
 
     return [fetchedPlaylist, controls]
 

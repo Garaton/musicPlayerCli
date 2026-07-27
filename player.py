@@ -1,10 +1,4 @@
-
-try:
-    from playsound3 import playsound
-except Exception:
-    from helpers import installLibraries
-    installLibraries()
-    from playsound3 import playsound
+from playsound3 import playsound
 
 from random import shuffle
 from time import sleep

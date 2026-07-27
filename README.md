@@ -18,9 +18,7 @@ Use the help command. I ain't writing allat.
 Volume is weird AF, which is why vf (volume force) exists, it sometimes doesn't work and you'll have to run vf.
 
 ## Playlist File Settings
-On the first like you have two comments (/ for mplay, # for m3u8, yes that's the only difference what the comment is), then you have different flags to determine behavior.
-- d: Treat files as directories (when you don't want to list out every single file/update this file when you add music) (yes you can do multiple)
-- y: Yes shuffle playlist
-- n: Don't shuffle playlist
+On the first line you have two comment indicators (#), then you have different flags to determine behavior.
+- y: Shuffle the playlist
 - v [vol %]: Sets volume to vol %
 - f: Do force volume (prevents some bugs)

@@ -37,14 +37,15 @@ else:
     platform = Os.UNSUPPORTED
 
 # Getting needed file variables
-playlistPath:list = os.getcwd()+"/playlists"
+playlistPath:list = os.getcwd()+'/playlists'
 playlistList:list = []
 for file in os.listdir(playlistPath):
     fileExt = file.split('.')[-1]
     if fileExt == 'mplay' or fileExt == 'm3u8':
         playlistList.append(file)
-musicPath:list = os.getcwd()+"/music"
-musicList:list = os.listdir(musicPath)
+musicPath:list = os.getcwd()+'/music'
+filesInDir:list = os.listdir(musicPath)
+musicList:list = [f for f in filesInDir if os.path.isfile(musicPath+'/'+f)]
 
 
 
@@ -165,7 +166,7 @@ def getPlaylist() -> list[list[str]]:
             song = line.split('#')[0].strip()
             
             # directory case
-            if song != '' and song[-1] == '/' and song[:-1] in musicList:
+            if song != '' and song[-1] == '/' and song[:-1] in filesInDir and os.path.isdir(musicPath+'/'+song):
                 for dirSong in os.listdir(usedPath+'/'+song):
                     if '.' in dirSong: # no recursive searching
                         fetchedPlaylist.append(usedPath+'/'+song+'/'+dirSong)

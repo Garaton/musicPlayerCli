@@ -36,6 +36,7 @@ def queue(args:list):
             print(f"-->\t[{globals.playlist[i].split('/')[-1]}]")
         else:
             print(f"{i}\t{globals.playlist[i].split('/')[-1]}")
+    print("\nCurrently Playing:\n\t"+globals.playlist[globals.curSong].split('/')[-1])
 
 def help(args:list[str]):
     if len(args) > 1:

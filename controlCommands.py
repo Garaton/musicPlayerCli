@@ -39,7 +39,7 @@ def queue(args:list):
     print("\nCurrently Playing:\n\t"+globals.playlist[globals.curSong].split('/')[-1])
 
 def help(args:list[str]):
-    if len(args) > 1:
+    if len(args) == 1:
         if args[1] in commandDict:
             print(commandDict[args[1]].helpText)
         else:
@@ -119,7 +119,7 @@ def restart(args:list):
 
 def goToIndex(args:list[str]):
     if len(args) == 1:
-        if args[0].isnumeric():
+        if args[0].isdigit():
             indexSong = int(args[0])
             if indexSong < len(globals.playlist) and indexSong >= 0:
                 globals.argsPassToPlayer = [indexSong]
@@ -138,33 +138,32 @@ def volumeForce(args:list):
 
 def volume(args:list[str]):
     if len(args) == 1:
-        if args[0].isnumeric():
+        try:
             newCurrentVolume = float(args[0])
-            newCurrentVolume = 999
             if newCurrentVolume > 1.0 or newCurrentVolume < 0.0:
                 print("Entered volume was not between 0.0 and 1.0, moving back to control panel.")
             else:
                 globals.currentVolume = newCurrentVolume
                 setVolume(globals.currentVolume)
-        else:
+        except ValueError:
             print("Please enter a number for the index not a string.")
     else:
         print("Too few or too many arguments for command.\n\tUsage:\tv [value 0 to 1]")
 
 # Command Dict
 commandDict = {
-    's': Command(skip, "s - Skip Song - Ends the current song prematurely and moves onto the next one, with loop enable this acts as a restart."),
-    'p': Command(previous, "p - Previous Song - End the current song prematurely and moves to the previous song, OVERRIDES LOOP."),
-    'st': Command(stop, "st - Stop Song - This doesn't 'pause' the song, it turns off the volume and just loops the song. Hey give me some credit it's creative. PRESERVES PREVIOUS LOOPING STATUS."),
-    'q': Command(queue, "q - Current Queue - Prints the songs in the playlist w/ order along with the current song surrounded by []."),
-    'help': Command(help, "help [cmd] - Help - Gives help about a single command, and if you input nothing, everything! Also weird to say help help, but you do you pal."),
-    'i': Command(goToIndex, "i [song-index] - Index - Jumps to the song at index song-index for the playlist."),
-    'l': Command(loop, "l - Loop Current Song - Tells the audio player to replay the song instead of moving onto the next one."),
-    'r': Command(restart, "r - Restart Playlist - Stops the song and then starts the play list from the start."),
-    'v': Command(volume, "v [value 0 to 1] - Set Volume - Uses the given volume from the user, and then sets the volume of this python application, usually."),
-    'vf': Command(volumeForce, "vf - Force Volume - In the case that volume isn't set correctly, spam this a few times."),
-    'e': Command(exitProg, "e - Exit - 'Gracefully' exits the program, it's multithreaded so it's not that graceful but it's better."),
-    'h': Command(shufflePlay, "h - Shuffle Playlist - Shuffles the current playlist, does not preserve the current song."),
-    'n': Command(newPlay, "n - New Playlist - Prompts you to give a new playlist to listen to."),
-    'nh': Command(newPlayShuffle, "nh - New Playlist And Shuffle - I wonder if new playlist and shuffle, prompts you to get a new playlist, and shuffles it for you, hmm."),
+    's': Command(skip, "s\tSkip Song - Ends the current song prematurely and moves onto the next one, with loop enable this acts as a restart."),
+    'p': Command(previous, "p\tPrevious Song - End the current song prematurely and moves to the previous song, OVERRIDES LOOP."),
+    'st': Command(stop, "st\tStop Song - This doesn't 'pause' the song, it turns off the volume and just loops the song. Hey give me some credit it's creative. PRESERVES PREVIOUS LOOPING STATUS."),
+    'q': Command(queue, "q\tCurrent Queue - Prints the songs in the playlist w/ order along with the current song surrounded by []."),
+    'help': Command(help, "help [cmd]\tHelp - Gives help about a single command, and if you input nothing, everything! Also weird to say help help, but you do you pal."),
+    'i': Command(goToIndex, "i [song-index]\tIndex - Jumps to the song at index song-index for the playlist."),
+    'l': Command(loop, "l\tLoop Current Song - Tells the audio player to replay the song instead of moving onto the next one."),
+    'r': Command(restart, "r\tRestart Playlist - Stops the song and then starts the play list from the start."),
+    'v': Command(volume, "v [value 0 to 1]\tSet Volume - Uses the given volume from the user, and then sets the volume of this python application, usually."),
+    'vf': Command(volumeForce, "vf\tForce Volume - In the case that volume isn't set correctly, spam this a few times."),
+    'e': Command(exitProg, "e\tExit - 'Gracefully' exits the program, it's multithreaded so it's not that graceful but it's better."),
+    'h': Command(shufflePlay, "h\tShuffle Playlist - Shuffles the current playlist, does not preserve the current song."),
+    'n': Command(newPlay, "n\tNew Playlist - Prompts you to give a new playlist to listen to."),
+    'nh': Command(newPlayShuffle, "nh\tNew Playlist And Shuffle - I wonder if new playlist and shuffle, prompts you to get a new playlist, and shuffles it for you, hmm."),
 }

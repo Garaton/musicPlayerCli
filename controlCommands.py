@@ -40,10 +40,10 @@ def queue(args:list):
 
 def help(args:list[str]):
     if len(args) == 1:
-        if args[1] in commandDict:
-            print(commandDict[args[1]].helpText)
+        if args[0] in commandDict:
+            print(commandDict[args[0]].helpText)
         else:
-            print(f"Command, {args[1]}, doesn't exist.")
+            print(f"Command, {args[0]}, doesn't exist.")
     else:
         for command in commandDict.values():
             print(command.helpText)

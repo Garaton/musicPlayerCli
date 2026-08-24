@@ -12,6 +12,15 @@ from collections.abc import Callable
 from helpers import ControlSignals, getPlaylist, setVolume
 
 
+# Very common command actions
+def stopSong():
+    """
+    Typically used when sending a signal over to the music player
+    """
+    if globals.currentSound is not None:
+        globals.currentSound.stop()
+
+
 # Command class/struct
 class Command:
     helpText:str
@@ -25,8 +34,7 @@ class Command:
 # Command Functions
 def exitProg(args:list):
     globals.movementControl = ControlSignals.EXIT
-    if globals.currentSound is not None:
-        globals.currentSound.stop()
+    stopSong()
     sys.exit(0)
 
 def queue(args:list):
@@ -49,13 +57,11 @@ def help(args:list[str]):
             print(command.helpText)
 
 def skip(args:list):
-    if globals.currentSound is not None:
-        globals.currentSound.stop()
+    stopSong()
 
 def previous(args:list):
     globals.movementControl = ControlSignals.PREVIOUS
-    if globals.currentSound is not None:
-        globals.currentSound.stop()
+    stopSong()
 
 def loop(args:list):
     if globals.movementControl != ControlSignals.LOOP:
@@ -65,8 +71,7 @@ def loop(args:list):
 
 def shufflePlay(args:list):
     globals.controlSignal = ControlSignals.RESTART_SHUFFLE
-    if globals.currentSound is not None:
-        globals.currentSound.stop()
+    stopSong()
 
 def newPlay(args:list):
     gotPlaylist = getPlaylist()
@@ -81,8 +86,7 @@ def newPlay(args:list):
                 setVolume(globals.currentVolume)
 
         globals.controlSignal = ControlSignals.NEW_PLAYLIST # new playlist
-        if globals.currentSound is not None:
-            globals.currentSound.stop()
+        stopSong()
 
 def newPlayShuffle(args:list):
     gotPlaylist = getPlaylist()
@@ -95,8 +99,7 @@ def newPlayShuffle(args:list):
         shuffle(globals.newPlaylist)
 
         globals.controlSignal = ControlSignals.NEW_PLAYLIST # new playlist
-        if globals.currentSound is not None:
-            globals.currentSound.stop()
+        stopSong()
 
 def stop(args:list):
     if not globals.isStopped:
@@ -114,8 +117,7 @@ def stop(args:list):
 
 def restart(args:list):
     globals.controlSignal = ControlSignals.RESTART
-    if globals.currentSound is not None:
-        globals.currentSound.stop()
+    stopSong()
 
 def goToIndex(args:list[str]):
     if len(args) == 1:
@@ -124,8 +126,7 @@ def goToIndex(args:list[str]):
             if indexSong < len(globals.playlist) and indexSong >= 0:
                 globals.argsPassToPlayer = [indexSong]
                 globals.movementControl = ControlSignals.INDEX
-                if globals.currentSound is not None:
-                    globals.currentSound.stop()
+                stopSong()
             else:
                 print(f"Index out of bounds for length {len(globals.playlist)}.")
         else:
